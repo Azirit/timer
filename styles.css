@@ -291,3 +291,16 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
 }
+
+/* Topbar */
+.topbar { display:flex; justify-content:flex-end; margin-bottom:8px; }
+.icon-btn { background:#0b1220; border:1px solid #1f2937; color:#93c5fd; border-radius:8px; padding:8px; cursor:pointer; transition:background .2s, transform .2s; }
+.icon-btn:hover{ background:#111827; transform:translateY(-1px); }
+.icon-btn:focus-visible{ outline:3px solid #93c5fd; outline-offset:2px; }
+
+/* Порядок блоков обновлён: Пуск над быстрыми кнопками */
+.control-buttons { margin: 10px 0 10px; }
+.quick-buttons { margin-top: 0; }
+
+/* mic button reuses icon-btn styles; add active state */
+#micbtn[aria-pressed="true"] { background:#111827; box-shadow: inset 0 0 0 1px #2563eb; }

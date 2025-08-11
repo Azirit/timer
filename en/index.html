@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Online Timer: 1–7 minutes, count up, stopwatch</title>
+  <meta name="description" content="Fast online timer with big digits: presets 1, 3, 5, 6, 7 minutes or count up from 0. Start/Pause with a single button." />
+  <link rel="canonical" href="https://brutal-pump-timer.netlify.app/en/" />
+  <link rel="alternate" hreflang="en" href="https://brutal-pump-timer.netlify.app/en/" />
+  <link rel="alternate" hreflang="ru" href="https://brutal-pump-timer.netlify.app/" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>.visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;border:0;padding:0;clip:rect(0 0 0 0);overflow:hidden;white-space:nowrap}</style>
+</head>
+<body>
+  <h1 class="visually-hidden">Online timer with big digits and quick start</h1>
+  <div id="aria-live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+  <div class="card" role="application" aria-label="Timer application">
+    <div class="topbar" aria-hidden="false">
+      <button id="fsbtn" class="icon-btn" type="button" aria-label="Fullscreen" title="Fullscreen" data-state="off">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" stroke="#93c5fd" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="time-inputs">
+      <div class="row">
+        <label class="visually-hidden" for="mins">Minutes</label>
+        <input id="mins" type="number" placeholder="Minutes" min="0" max="99" inputmode="numeric" aria-label="Minutes" />
+        <label class="visually-hidden" for="secs">Seconds</label>
+        <input id="secs" type="number" placeholder="Seconds" min="0" max="59" inputmode="numeric" aria-label="Seconds" />
+      </div>
+    </div>
+
+    <div class="header">
+      <button id="reset" class="reset-btn" type="button" aria-label="Reset timer" disabled>Reset</button>
+    </div>
+
+    <div class="display" id="time" role="timer" aria-live="off" aria-atomic="true" aria-label="Remaining time" data-word-min="minutes" data-word-sec="seconds" data-word-cs="hundredths">00:00:00</div>
+
+    <div class="control-buttons">
+      <div class="row">
+        <button id="start" type="button" aria-label="Start" data-label-start="Start" data-label-pause="Pause" data-label-resume="Resume">Start</button>
+      </div>
+    </div>
+
+    <div class="quick-buttons" role="group" aria-label="Quick presets">
+      <button class="quick-btn" type="button" data-minutes="1" aria-label="Set 1 minute" aria-pressed="false">1</button>
+      <button class="quick-btn" type="button" data-minutes="3" aria-label="Set 3 minutes" aria-pressed="false">3</button>
+      <button class="quick-btn" type="button" data-minutes="5" aria-label="Set 5 minutes" aria-pressed="false">5</button>
+      <button class="quick-btn" type="button" data-minutes="6" aria-label="Set 6 minutes" aria-pressed="false">6</button>
+      <button class="quick-btn" type="button" data-minutes="7" aria-label="Set 7 minutes" aria-pressed="false">7</button>
+      <button class="quick-btn count-up-btn" type="button" aria-label="Count up from zero" aria-pressed="false">0</button>
+    </div>
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>

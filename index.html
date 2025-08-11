@@ -7,6 +7,8 @@
   <meta name="description" content="Быстрый онлайн таймер с большими цифрами: 1, 3, 5, 6, 7 минут и отсчёт от 0. Старт/Пауза одной кнопкой, без рекламы, удобно для тренировок и интервалов." />
   <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
   <link rel="canonical" href="https://brutal-pump-timer.netlify.app/" />
+  <link rel="alternate" hreflang="ru" href="https://brutal-pump-timer.netlify.app/" />
+  <link rel="alternate" hreflang="en" href="https://brutal-pump-timer.netlify.app/en/" />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
@@ -20,6 +22,20 @@
   <h1 class="visually-hidden">Онлайн таймер с большими цифрами и быстрым запуском</h1>
   <div id="aria-live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
   <div class="card" role="application" aria-label="Приложение таймера">
+    <div class="topbar" aria-hidden="false">
+      <button id="fsbtn" class="icon-btn" type="button" aria-label="Полноэкранный режим" title="Полноэкранный режим" data-state="off">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" stroke="#93c5fd" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button id="micbtn" class="icon-btn" type="button" aria-label="Голосовой ввод" title="Голосовой ввод">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3Z" stroke="#93c5fd" stroke-width="2"/>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="#93c5fd" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
     <div class="time-inputs">
       <div class="row">
         <label class="visually-hidden" for="mins">Минуты</label>
@@ -33,7 +49,13 @@
       <button id="reset" class="reset-btn" type="button" aria-label="Сбросить таймер" disabled>Сброс</button>
     </div>
 
-    <div class="display" id="time" role="timer" aria-live="off" aria-atomic="true" aria-label="Оставшееся время">00:00:00</div>
+    <div class="display" id="time" role="timer" aria-live="off" aria-atomic="true" aria-label="Оставшееся время" data-word-min="минут" data-word-sec="секунд" data-word-cs="сотых">00:00:00</div>
+
+    <div class="control-buttons">
+      <div class="row">
+        <button id="start" type="button" aria-describedby="kbd-hint" aria-label="Пуск" data-label-start="Пуск" data-label-pause="Пауза" data-label-resume="Возобновить">Пуск</button>
+      </div>
+    </div>
 
     <div class="quick-buttons" role="group" aria-label="Быстрая установка минут">
       <button class="quick-btn" type="button" data-minutes="1" aria-label="Установить 1 минуту" aria-pressed="false">1</button>
@@ -44,12 +66,7 @@
       <button class="quick-btn count-up-btn" type="button" aria-label="Отсчёт от нуля" aria-pressed="false">0</button>
     </div>
 
-    <p id="kbd-hint" class="visually-hidden">Горячие клавиши: пробел или Enter — старт/пауза; R — сброс; цифры 1, 3, 5, 6, 7 и 0 — быстрая установка минут.</p>
-    <div class="control-buttons">
-      <div class="row">
-        <button id="start" type="button" aria-describedby="kbd-hint" aria-label="Пуск">Пуск</button>
-      </div>
-    </div>
+    <p id="kbd-hint" class="visually-hidden">Горячие клавиши: пробел или Enter — пуск/пауза; R — сброс; цифры 1, 3, 5, 6, 7 и 0 — быстрая установка минут. Голос: «установи время на 3 минуты 40 секунд», «пуск», «пауза», «сброс».</p>
   </div>
 
   <script src="script.js"></script>

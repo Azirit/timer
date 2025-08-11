@@ -5,6 +5,8 @@ const minsEl = d.getElementById('mins');
 const secsEl = d.getElementById('secs');
 const startBtn = d.getElementById('start');
 const resetBtn = d.getElementById('reset');
+const fsBtn = document.getElementById('fsbtn');
+const micBtn = document.getElementById('micbtn');
 
 let remainingMs = 0;
 let timer = null;
@@ -12,6 +14,8 @@ let paused = false;
 let isCountUp = false;
 let wakeLock = null;
 let buttonMode = 'ready'; // 'ready' | 'running' | 'paused'
+
+let recog = null;
 
 function announce(msg){ if(live){ live.textContent = msg; } }
 const clamp = (n,min,max)=> Math.min(max, Math.max(min,n));
@@ -32,20 +36,37 @@ function inputsToMs(){
   return (m*60 + s) * 1000;
 }
 
+function isFullscreen(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+async function toggleFullscreen(){
+  try{
+    if (!isFullscreen()){
+      const root = document.documentElement;
+      await (root.requestFullscreen?.() || root.webkitRequestFullscreen?.());
+      fsBtn?.setAttribute('data-state','on');
+    } else {
+      await (document.exitFullscreen?.() || document.webkitExitFullscreen?.());
+      fsBtn?.setAttribute('data-state','off');
+    }
+  }catch(e){}
+}
+
+fsBtn?.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', ()=>{
+  fsBtn?.setAttribute('data-state', isFullscreen() ? 'on' : 'off');
+});
+
+// локализация текста на кнопке пуск через data-атрибуты
 function setButtonState(mode){
   buttonMode = mode;
+  const startLabel = startBtn.getAttribute('data-label-start') || 'Пуск';
+  const pauseLabel = startBtn.getAttribute('data-label-pause') || 'Пауза';
+  const resumeLabel = startBtn.getAttribute('data-label-resume') || 'Возобновить';
   if (mode === 'running'){
-    startBtn.classList.add('running');
-    startBtn.textContent = 'Пауза';
-    startBtn.setAttribute('aria-label','Пауза');
+    startBtn.classList.add('running'); startBtn.textContent = pauseLabel; startBtn.setAttribute('aria-label', pauseLabel);
   } else if (mode === 'paused'){
-    startBtn.classList.remove('running');
-    startBtn.textContent = 'Возобновить';
-    startBtn.setAttribute('aria-label','Возобновить');
+    startBtn.classList.remove('running'); startBtn.textContent = resumeLabel; startBtn.setAttribute('aria-label', resumeLabel);
   } else {
-    startBtn.classList.remove('running');
-    startBtn.textContent = 'Пуск';
-    startBtn.setAttribute('aria-label','Пуск');
+    startBtn.classList.remove('running'); startBtn.textContent = startLabel; startBtn.setAttribute('aria-label', startLabel);
   }
 }
 
@@ -133,6 +154,63 @@ function updateQuickButtons(){
   if (isCountUp){ const el = document.querySelector('.count-up-btn'); if(el){ el.classList.add('active'); el.setAttribute('aria-pressed','true'); } }
   else { const mins = parseInt(minsEl.value||'0'); if (mins>0){ const btn=d.querySelector(`[data-minutes="${mins}"]`); if(btn){ btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); } } }
 }
+
+function supportedSpeech(){ return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window; }
+function createRecognizer(){
+  const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition; if(!Ctor) return null;
+  const r = new Ctor();
+  r.lang = document.documentElement.lang === 'en' ? 'en-US' : 'ru-RU';
+  r.interimResults = false; r.maxAlternatives = 1; return r;
+}
+
+function parseTimeCommand(text){
+  const t = text.toLowerCase().replaceAll(',', '.').replace(/\s+/g,' ').trim();
+  // команды управления
+  if (/(старт|пуск|запусти|поехали|start|go|begin)/.test(t)) return {cmd:'start'};
+  if (/(пауза|останови|pause|hold|stop)/.test(t)) return {cmd:'pause'};
+  if (/(сброс|reset|clear)/.test(t)) return {cmd:'reset'};
+
+  // время: минуты и секунды
+  // ru: "установи время на 3 минуты 40 секунд", "3 мин 5 сек"
+  const ru = /(?:(\d{1,2})\s*(?:мин|минут[уы]?))?\s*(?:(\d{1,2})\s*(?:сек|секунд[уы]?))?/;
+  const en = /(?:(\d{1,2})\s*(?:m|minute|minutes))?\s*(?:(\d{1,2})\s*(?:s|sec|second|seconds))?/;
+  let m=null,s=null;
+  const m1 = ru.exec(t) || en.exec(t);
+  if (m1){ m = m1[1] ? parseInt(m1[1]) : 0; s = m1[2] ? parseInt(m1[2]) : 0; }
+  if (m===null && s===null){
+    // простая форма: "3:40" или "3 40"
+    const x = /^(\d{1,2})[:\s](\d{1,2})$/.exec(t);
+    if (x){ m=parseInt(x[1]); s=parseInt(x[2]); }
+  }
+  if (Number.isInteger(m) || Number.isInteger(s)){
+    m = clamp(m||0,0,99); s = clamp(s||0,0,59);
+    return {cmd:'set', m, s};
+  }
+  return null;
+}
+
+function startMic(){
+  if (!supportedSpeech()) { announce('Голосовой ввод не поддерживается'); return; }
+  recog = createRecognizer(); if (!recog) return;
+  micBtn?.setAttribute('aria-pressed','true');
+  try{ recog.start(); }catch(e){}
+  recog.onresult = (e)=>{
+    const text = e.results[0][0].transcript || ''; announce('Распознано: '+text);
+    const res = parseTimeCommand(text);
+    if (!res){ micBtn?.setAttribute('aria-pressed','false'); return; }
+    if (res.cmd==='start'){ start(); }
+    else if (res.cmd==='pause'){ pause(); }
+    else if (res.cmd==='reset'){ reset(); }
+    else if (res.cmd==='set'){
+      minsEl.value = res.m; secsEl.value = res.s; renderFromInputs(); updateQuickButtons(); resetBtn.disabled=false; setButtonState('ready');
+    }
+    micBtn?.setAttribute('aria-pressed','false');
+  };
+  recog.onend = ()=>{ micBtn?.setAttribute('aria-pressed','false'); };
+  recog.onerror = ()=>{ micBtn?.setAttribute('aria-pressed','false'); };
+}
+
+micBtn?.addEventListener('click', startMic);
 
 if ('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('/service-worker.js').catch(()=>{}); }); }
 
