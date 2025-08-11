@@ -175,6 +175,10 @@ button:disabled {
 #start.running { background: #ca8a04; }
 #start.running:hover:not(:disabled) { background: #a16207; }
 
+/* увеличить паддинги кнопок Старт и Сброс и унифицировать размеры */
+#start { padding-top: 19px; padding-bottom: 19px; font-size: 16px; font-weight: 700; }
+.reset-btn { padding-top: 19px; padding-bottom: 19px; font-size: 16px; font-weight: 700; }
+
 /* Мобильная оптимизация */
 @media (max-width: 480px) {
   body {
@@ -244,6 +248,19 @@ button:disabled {
     font-size: 14px;
     border-radius: 8px;
   }
+}
+
+@media (max-width: 480px) {
+  #start { padding-top: 17px; padding-bottom: 17px; font-size: 15px; }
+  .reset-btn { padding-top: 17px; padding-bottom: 17px; font-size: 15px; }
+}
+@media (max-width: 360px) {
+  #start { padding-top: 15px; padding-bottom: 15px; font-size: 14px; }
+  .reset-btn { padding-top: 15px; padding-bottom: 15px; font-size: 14px; }
+}
+@media (max-width: 240px) {
+  #start { padding-top: 13px; padding-bottom: 13px; font-size: 13px; }
+  .reset-btn { padding-top: 13px; padding-bottom: 13px; font-size: 13px; }
 }
 
 /* Очень маленькие экраны */

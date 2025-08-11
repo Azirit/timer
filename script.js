@@ -167,25 +167,32 @@ function parseTimeCommand(text){
   const t = text.toLowerCase().replaceAll(',', '.').replace(/\s+/g,' ').trim();
   // команды управления
   if (/(старт|пуск|запусти|поехали|start|go|begin)/.test(t)) return {cmd:'start'};
-  if (/(пауза|останови|pause|hold|stop)/.test(t)) return {cmd:'pause'};
+  if (/(пауза|останови|приостанови|pause|hold|stop)/.test(t)) return {cmd:'pause'};
   if (/(сброс|reset|clear)/.test(t)) return {cmd:'reset'};
 
-  // время: минуты и секунды
-  // ru: "установи время на 3 минуты 40 секунд", "3 мин 5 сек"
-  const ru = /(?:(\d{1,2})\s*(?:мин|минут[уы]?))?\s*(?:(\d{1,2})\s*(?:сек|секунд[уы]?))?/;
-  const en = /(?:(\d{1,2})\s*(?:m|minute|minutes))?\s*(?:(\d{1,2})\s*(?:s|sec|second|seconds))?/;
-  let m=null,s=null;
-  const m1 = ru.exec(t) || en.exec(t);
-  if (m1){ m = m1[1] ? parseInt(m1[1]) : 0; s = m1[2] ? parseInt(m1[2]) : 0; }
-  if (m===null && s===null){
-    // простая форма: "3:40" или "3 40"
-    const x = /^(\d{1,2})[:\s](\d{1,2})$/.exec(t);
-    if (x){ m=parseInt(x[1]); s=parseInt(x[2]); }
-  }
-  if (Number.isInteger(m) || Number.isInteger(s)){
-    m = clamp(m||0,0,99); s = clamp(s||0,0,59);
+  // числовой формат 2:34 или 2.34
+  const colon = /(\d{1,2})\s*[:\.\s]\s*(\d{1,2})/.exec(t);
+  if (colon){
+    const m = clamp(parseInt(colon[1]),0,99);
+    const s = clamp(parseInt(colon[2]),0,59);
     return {cmd:'set', m, s};
   }
+
+  // независимый поиск минут и секунд в любом порядке
+  const ruMin = /(\d{1,2})\s*(?:м|мин|минут[аыу]?)/;
+  const ruSec = /(\d{1,2})\s*(?:с|сек|секунд[аыу]?)/;
+  const enMin = /(\d{1,2})\s*(?:m|mins?|minutes?)/;
+  const enSec = /(\d{1,2})\s*(?:s|secs?|seconds?)/;
+
+  const mMatch = t.match(ruMin) || t.match(enMin);
+  const sMatch = t.match(ruSec) || t.match(enSec);
+
+  if (mMatch || sMatch){
+    const m = clamp(parseInt(mMatch?.[1] || '0',10),0,99);
+    const s = clamp(parseInt(sMatch?.[1] || '0',10),0,59);
+    return {cmd:'set', m, s};
+  }
+
   return null;
 }
 
