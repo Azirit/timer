@@ -8,16 +8,15 @@
 </head>
 <body>
   <div class="card">
-    <div class="header">
-      <h1>Таймер</h1>
-      <button id="reset" class="reset-btn" disabled>Сброс</button>
-    </div>
-
     <div class="time-inputs">
       <div class="row">
         <input id="mins" type="number" placeholder="Минуты" min="0" inputmode="numeric" />
         <input id="secs" type="number" placeholder="Секунды" min="0" max="59" inputmode="numeric" />
       </div>
+    </div>
+
+    <div class="header">
+      <button id="reset" class="reset-btn" disabled>Сброс</button>
     </div>
 
     <div class="display" id="time">00:00</div>

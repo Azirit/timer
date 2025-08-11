@@ -26,6 +26,16 @@ function updateDisplay() {
   render(total);
 }
 
+function setButtonState(running) {
+  if (running) {
+    startBtn.classList.add('running');
+    startBtn.textContent = 'Пауза';
+  } else {
+    startBtn.classList.remove('running');
+    startBtn.textContent = 'Старт';
+  }
+}
+
 function beep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -40,7 +50,6 @@ function beep() {
     o.start(); 
     o.stop(ctx.currentTime + 0.6);
   } catch (e) {}
-  
   if ('vibrate' in navigator) navigator.vibrate([120, 60, 120]);
 }
 
@@ -54,16 +63,12 @@ function setQuickTime(minutes) {
 
 function startCountUp() {
   isCountUp = true;
-  remaining = 0;
-  minsEl.value = 0;
-  secsEl.value = 0;
-  updateDisplay();
+  remaining = paused ? remaining : 0;
+  if (!paused) { minsEl.value = 0; secsEl.value = 0; updateDisplay(); }
   updateQuickButtons();
-  
-  startBtn.disabled = false;
+
   resetBtn.disabled = false;
-  startBtn.textContent = 'Пауза';
-  startBtn.classList.add('running');
+  setButtonState(true);
 
   clearInterval(timer);
   timer = setInterval(() => {
@@ -74,33 +79,27 @@ function startCountUp() {
 }
 
 function start() {
-  if (isCountUp) {
-    // Если это обратный отсчет, останавливаем его
-    clearInterval(timer);
-    timer = null;
-    startBtn.textContent = 'Старт';
-    startBtn.classList.remove('running');
-    isCountUp = false;
-    return;
-  }
+  // Если уже идет — ставим на паузу
+  if (timer) { pause(); return; }
 
-  if (timer) {
-    // Если таймер уже запущен, ставим на паузу
-    pause();
-    return;
-  }
+  // Режим count-up: если он активен и мы на паузе — продолжить
+  if (isCountUp && paused) { paused = false; startCountUp(); return; }
 
   const m = parseInt(minsEl.value || '0', 10);
   const s = parseInt(secsEl.value || '0', 10);
   const total = paused ? remaining : (m * 60 + Math.min(59, s));
-  
+
+  // Если время не задано и не пауза — запускаем отсчет вверх с 0
+  if (!total && !paused) { startCountUp(); return; }
+
   if (!total) return;
 
+  // Обычный обратный отсчет
+  isCountUp = false;
   remaining = total;
   paused = false;
-  startBtn.textContent = 'Пауза';
-  startBtn.classList.add('running');
   resetBtn.disabled = false;
+  setButtonState(true);
 
   clearInterval(timer);
   timer = setInterval(() => {
@@ -108,9 +107,8 @@ function start() {
     render(remaining);
     if (remaining <= 0) {
       clearInterval(timer);
-      startBtn.textContent = 'Старт';
-      startBtn.classList.remove('running');
       timer = null;
+      setButtonState(false);
       beep();
     }
   }, 1000);
@@ -122,8 +120,7 @@ function pause() {
   paused = true;
   clearInterval(timer);
   timer = null;
-  startBtn.textContent = 'Старт';
-  startBtn.classList.remove('running');
+  setButtonState(false);
 }
 
 function reset() {
@@ -132,8 +129,7 @@ function reset() {
   timer = null;
   remaining = 0;
   isCountUp = false;
-  startBtn.textContent = 'Старт';
-  startBtn.classList.remove('running');
+  setButtonState(false);
   render(0);
   startBtn.disabled = false;
   resetBtn.disabled = true;
@@ -161,9 +157,7 @@ function updateQuickButtons() {
 startBtn.addEventListener('click', start);
 resetBtn.addEventListener('click', reset);
 
-// Обработчики для быстрых кнопок
 document.addEventListener('DOMContentLoaded', function() {
-  // Добавляем обработчики для быстрых кнопок
   const quickBtns = document.querySelectorAll('.quick-btn');
   quickBtns.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -176,10 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Обработчики для полей ввода
   minsEl.addEventListener('input', updateDisplay);
   secsEl.addEventListener('input', updateDisplay);
 });
 
-// Первичная отрисовка
 render(0);
