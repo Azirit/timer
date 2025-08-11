@@ -1,0 +1,263 @@
+:root { 
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
+}
+
+body { 
+  margin: 0; 
+  display: grid; 
+  min-height: 100svh; 
+  place-items: center; 
+  background: #0f172a; 
+  color: #e5e7eb; 
+  padding: 8px;
+}
+
+.card { 
+  width: min(500px, 98vw); 
+  background: #111827; 
+  border-radius: 16px; 
+  padding: 16px; 
+  box-shadow: 0 8px 25px rgb(0 0 0 / .35); 
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+h1 { 
+  margin: 0; 
+  font-size: 20px; 
+  font-weight: 600; 
+  color: #93c5fd; 
+}
+
+.reset-btn {
+  background: #dc2626 !important;
+  color: white;
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: auto;
+  flex: none;
+}
+
+.reset-btn:hover:not(:disabled) {
+  background: #b91c1c !important;
+  transform: translateY(-1px);
+}
+
+.reset-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.display { 
+  font-variant-numeric: tabular-nums; 
+  font-size: clamp(42px, 18vw, 100px); 
+  text-align: center; 
+  margin: 12px 0 16px; 
+  letter-spacing: .04em; 
+  line-height: 1;
+}
+
+.row { 
+  display: flex; 
+  gap: 8px; 
+  flex-wrap: wrap; 
+}
+
+.quick-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.quick-btn {
+  flex: 1;
+  min-width: 70px;
+  border: 0;
+  border-radius: 10px;
+  padding: 14px 10px;
+  font-size: 16px;
+  font-weight: 700;
+  background: #374151;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-btn:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+}
+
+.quick-btn.active {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.time-inputs {
+  margin-bottom: 16px;
+}
+
+.time-inputs .row {
+  gap: 10px;
+}
+
+input[type="number"] { 
+  flex: 1; 
+  min-width: 0; 
+  background: #0b1220; 
+  color: #e5e7eb; 
+  border: 1px solid #1f2937; 
+  border-radius: 10px; 
+  padding: 12px 14px; 
+  font-size: 15px; 
+  text-align: center;
+}
+
+input::-webkit-outer-spin-button, 
+input::-webkit-inner-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+.control-buttons {
+  margin-bottom: 12px;
+}
+
+.control-buttons .row {
+  gap: 10px;
+}
+
+button { 
+  flex: 1; 
+  min-width: 0; 
+  border: 0; 
+  border-radius: 10px; 
+  padding: 14px; 
+  font-size: 15px; 
+  font-weight: 600; 
+  background: #2563eb; 
+  color: white; 
+  cursor: pointer; 
+  transition: all 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+button:disabled { 
+  opacity: .6; 
+  cursor: not-allowed; 
+  transform: none; 
+}
+
+/* Стили для кнопки старт/пауза */
+#start.running {
+  background: #dc2626;
+}
+
+#start.running:hover {
+  background: #b91c1c;
+}
+
+/* Мобильная оптимизация */
+@media (max-width: 480px) {
+  body {
+    padding: 5px;
+  }
+  
+  .card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .header {
+    margin-bottom: 8px;
+  }
+  
+  h1 {
+    font-size: 18px;
+  }
+  
+  .reset-btn {
+    padding: 5px 8px;
+    font-size: 12px;
+    border-radius: 5px;
+  }
+  
+  .display {
+    font-size: clamp(48px, 22vw, 80px);
+    margin: 10px 0 12px;
+  }
+  
+  .quick-buttons {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  
+  .quick-btn {
+    min-width: 60px;
+    padding: 12px 8px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+  
+  .time-inputs {
+    margin-bottom: 12px;
+  }
+  
+  .time-inputs .row {
+    gap: 8px;
+  }
+  
+  input[type="number"] {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+  
+  .control-buttons {
+    margin-bottom: 10px;
+  }
+  
+  .control-buttons .row {
+    gap: 8px;
+  }
+  
+  button {
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 360px) {
+  .card {
+    padding: 10px;
+  }
+  
+  .quick-btn {
+    min-width: 50px;
+    padding: 10px 6px;
+    font-size: 14px;
+  }
+  
+  .display {
+    font-size: clamp(40px, 20vw, 70px);
+  }
+}

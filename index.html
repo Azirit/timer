@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Таймер</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1>Таймер</h1>
+      <button id="reset" class="reset-btn" disabled>Сброс</button>
+    </div>
+
+    <div class="time-inputs">
+      <div class="row">
+        <input id="mins" type="number" placeholder="Минуты" min="0" inputmode="numeric" />
+        <input id="secs" type="number" placeholder="Секунды" min="0" max="59" inputmode="numeric" />
+      </div>
+    </div>
+
+    <div class="display" id="time">00:00</div>
+
+    <div class="quick-buttons">
+      <button class="quick-btn" data-minutes="1">1</button>
+      <button class="quick-btn" data-minutes="3">3</button>
+      <button class="quick-btn" data-minutes="5">5</button>
+      <button class="quick-btn" data-minutes="6">6</button>
+      <button class="quick-btn" data-minutes="7">7</button>
+      <button class="quick-btn count-up-btn">0</button>
+    </div>
+
+    <div class="control-buttons">
+      <div class="row">
+        <button id="start">Старт</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
