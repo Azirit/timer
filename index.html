@@ -33,7 +33,10 @@
 
   <meta name="theme-color" content="#0f172a" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" href="/favicon.ico" />
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <link rel="stylesheet" href="styles.css" />
@@ -81,32 +84,36 @@
     <div class="visually-hidden">Онлайн таймер с быстрыми пресетами 1–7 минут и отсчётом от 0. Для работы всех функций включите JavaScript.</div>
   </noscript>
   <h1 class="visually-hidden">Онлайн таймер с большими цифрами и быстрым запуском</h1>
-  <div class="card">
+  <div id="aria-live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+  <div class="card" role="application" aria-label="Приложение таймера">
     <div class="time-inputs">
       <div class="row">
-        <input id="mins" type="number" placeholder="Минуты" min="0" inputmode="numeric" />
-        <input id="secs" type="number" placeholder="Секунды" min="0" max="59" inputmode="numeric" />
+        <label class="visually-hidden" for="mins">Минуты</label>
+        <input id="mins" type="number" placeholder="Минуты" min="0" inputmode="numeric" aria-label="Минуты" />
+        <label class="visually-hidden" for="secs">Секунды</label>
+        <input id="secs" type="number" placeholder="Секунды" min="0" max="59" inputmode="numeric" aria-label="Секунды" />
       </div>
     </div>
 
     <div class="header">
-      <button id="reset" class="reset-btn" disabled>Сброс</button>
+      <button id="reset" class="reset-btn" type="button" aria-label="Сбросить таймер" disabled>Сброс</button>
     </div>
 
-    <div class="display" id="time">00:00</div>
+    <div class="display" id="time" role="timer" aria-live="off" aria-atomic="true" aria-label="Оставшееся время">00:00</div>
 
-    <div class="quick-buttons">
-      <button class="quick-btn" data-minutes="1">1</button>
-      <button class="quick-btn" data-minutes="3">3</button>
-      <button class="quick-btn" data-minutes="5">5</button>
-      <button class="quick-btn" data-minutes="6">6</button>
-      <button class="quick-btn" data-minutes="7">7</button>
-      <button class="quick-btn count-up-btn">0</button>
+    <div class="quick-buttons" role="group" aria-label="Быстрая установка минут">
+      <button class="quick-btn" type="button" data-minutes="1" aria-label="Установить 1 минуту" aria-pressed="false">1</button>
+      <button class="quick-btn" type="button" data-minutes="3" aria-label="Установить 3 минуты" aria-pressed="false">3</button>
+      <button class="quick-btn" type="button" data-minutes="5" aria-label="Установить 5 минут" aria-pressed="false">5</button>
+      <button class="quick-btn" type="button" data-minutes="6" aria-label="Установить 6 минут" aria-pressed="false">6</button>
+      <button class="quick-btn" type="button" data-minutes="7" aria-label="Установить 7 минут" aria-pressed="false">7</button>
+      <button class="quick-btn count-up-btn" type="button" aria-label="Отсчёт от нуля" aria-pressed="false">0</button>
     </div>
 
+    <p id="kbd-hint" class="visually-hidden">Горячие клавиши: пробел или Enter — старт/пауза; R — сброс; цифры 1, 3, 5, 6, 7 и 0 — быстрая установка минут.</p>
     <div class="control-buttons">
       <div class="row">
-        <button id="start">Старт</button>
+        <button id="start" type="button" aria-describedby="kbd-hint" aria-label="Старт">Старт</button>
       </div>
     </div>
   </div>
