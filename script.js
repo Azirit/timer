@@ -7,6 +7,12 @@ const startBtn = d.getElementById('start');
 const resetBtn = d.getElementById('reset');
 const fsBtn = document.getElementById('fsbtn');
 const micBtn = document.getElementById('micbtn');
+const subMinBtn = document.getElementById('subMin');
+const addMinBtn = document.getElementById('addMin');
+const sub10Btn  = document.getElementById('sub10');
+const add10Btn  = document.getElementById('add10');
+const decBtn    = document.getElementById('dec');
+const incBtn    = document.getElementById('inc');
 
 let remainingMs = 0;
 let timer = null;
@@ -149,10 +155,12 @@ function reset(){
   paused=false; clearInterval(timer); timer=null; remainingMs=0; isCountUp=false; setButtonState('ready'); renderMs(0); startBtn.disabled=false; resetBtn.disabled=true; minsEl.value=''; secsEl.value=''; updateQuickButtons(); releaseWakeLock(); announce('Сброс таймера'); }
 
 function updateQuickButtons(){
-  const quickBtns = document.querySelectorAll('.quick-btn');
+  const quickContainer = document.querySelector('.quick-buttons');
+  if (!quickContainer) return;
+  const quickBtns = quickContainer.querySelectorAll('.quick-btn');
   quickBtns.forEach(btn=>{ btn.classList.remove('active'); btn.setAttribute('aria-pressed','false'); });
-  if (isCountUp){ const el = document.querySelector('.count-up-btn'); if(el){ el.classList.add('active'); el.setAttribute('aria-pressed','true'); } }
-  else { const mins = parseInt(minsEl.value||'0'); if (mins>0){ const btn=d.querySelector(`[data-minutes="${mins}"]`); if(btn){ btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); } } }
+  if (isCountUp){ const el = quickContainer.querySelector('.count-up-btn'); if(el){ el.classList.add('active'); el.setAttribute('aria-pressed','true'); } }
+  else { const mins = parseInt(minsEl.value||'0'); if (mins>0){ const btn=quickContainer.querySelector(`[data-minutes="${mins}"]`); if(btn){ btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); } } }
 }
 
 function supportedSpeech(){ return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window; }
@@ -221,20 +229,57 @@ micBtn?.addEventListener('click', startMic);
 
 if ('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('/service-worker.js').catch(()=>{}); }); }
 
-function onKey(e){
-  const k=e.key.toLowerCase();
-  if (k===' '||k==='enter'){ e.preventDefault(); start(); }
-  if (k==='r'){ e.preventDefault(); reset(); }
-  if(['1','3','5','6','7','0'].includes(k)){ e.preventDefault(); if(k==='0') setQuickTime(0); else setQuickTime(parseInt(k,10)); }
+function clampMs(ms){ return Math.max(0, Math.min(ms, 99*60*1000 + 59*1000)); }
+function applyDelta(msDelta){
+  if (buttonMode === 'ready'){
+    const cur = inputsToMs();
+    const next = clampMs(cur + msDelta);
+    const mins = Math.floor(next/60000);
+    const secs = Math.floor((next%60000)/1000);
+    minsEl.value = mins; secsEl.value = secs; renderFromInputs(); updateQuickButtons();
+  } else {
+    remainingMs = clampMs(remainingMs + (isCountUp ? msDelta : msDelta));
+    renderMs(remainingMs);
+  }
 }
 
-d.addEventListener('keydown', onKey);
+function hold(btn, delta){
+  let t=null; const step=()=>{ applyDelta(delta); t=setTimeout(step, 100); };
+  const start=()=>{ applyDelta(delta); t=setTimeout(step, 300); };
+  const stop=()=>{ clearTimeout(t); t=null; };
+  btn.addEventListener('mousedown', start);
+  btn.addEventListener('touchstart', (e)=>{ e.preventDefault(); start(); }, {passive:false});
+  ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=> btn.addEventListener(ev, stop));
+}
+
+subMinBtn?.addEventListener('click', ()=> applyDelta(-60_000));
+addMinBtn?.addEventListener('click', ()=> applyDelta(+60_000));
+sub10Btn?.addEventListener('click', ()=> applyDelta(-10_000));
+add10Btn?.addEventListener('click', ()=> applyDelta(+10_000));
+hold(decBtn, -1_000);
+hold(incBtn, +1_000);
+
+// клавиши +/- как регулировка по секунде
+function onKeyAdjust(e){
+  if (e.key === '+' || e.key === '='){ applyDelta(+1000); }
+  if (e.key === '-' || e.key === '_'){ applyDelta(-1000); }
+}
+
+d.addEventListener('keydown', onKeyAdjust);
 startBtn.addEventListener('click', start);
 resetBtn.addEventListener('click', reset);
 
 document.addEventListener('DOMContentLoaded', function(){
-  const quickBtns = document.querySelectorAll('.quick-btn');
-  quickBtns.forEach(btn=>{ btn.addEventListener('click', function(){ if(this.classList.contains('count-up-btn')) setQuickTime(0); else setQuickTime(parseInt(this.dataset.minutes)); }); });
+  const quickContainer = document.querySelector('.quick-buttons');
+  if (quickContainer){
+    const quickBtns = quickContainer.querySelectorAll('.quick-btn');
+    quickBtns.forEach(btn=>{
+      btn.addEventListener('click', function(){
+        if (this.classList.contains('count-up-btn')) setQuickTime(0);
+        else if (this.dataset.minutes) setQuickTime(parseInt(this.dataset.minutes));
+      });
+    });
+  }
   const onEdit = ()=>{ clearInterval(timer); timer=null; paused=false; isCountUp=false; resetBtn.disabled=true; setButtonState('ready'); renderFromInputs(); releaseWakeLock(); updateQuickButtons(); };
   minsEl.addEventListener('input', onEdit);
   secsEl.addEventListener('input', onEdit);

@@ -1,4 +1,4 @@
-const VERSION = 'v1.0.1';
+const VERSION = 'v1.0.3';
 const STATIC_CACHE = `timer-static-${VERSION}`;
 const ASSETS = [
   '/styles.css',
